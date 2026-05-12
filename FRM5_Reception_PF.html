@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1e40af">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Réception PF — FRM5</title>
+<link rel="manifest" id="manifest-link">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--blue:#1e40af;--blue-light:#dbeafe;--green:#16a34a;--green-bg:#dcfce7;--red:#dc2626;--red-bg:#fecaca;--gray:#64748b;--gray-light:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;color:var(--text);min-height:100vh;min-height:100dvh;overflow-x:hidden}
+input,textarea,select,button{font-family:inherit;font-size:14px}
+.app{max-width:500px;margin:0 auto;position:relative}
+
+/* Header */
+.header{background:#fff;border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.header-badge{width:36px;height:36px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0}
+.header h1{font-size:15px;font-weight:700;color:var(--text);line-height:1.2}
+.header .sub{font-size:10.5px;color:var(--gray);letter-spacing:.5px;margin-top:2px}
+
+/* Steps */
+.steps{display:flex;gap:4px}
+.step-btn{flex:1;padding:7px 2px;border-radius:7px;border:none;font-size:10px;font-weight:700;cursor:pointer;transition:.2s;line-height:1.3}
+.step-btn.current{background:var(--blue);color:#fff}
+.step-btn.done{background:var(--green-bg);color:#166534}
+.step-btn.locked{background:var(--gray-light);color:#94a3b8}
+
+/* Content */
+.content{padding:8px 14px 140px}
+.section-title{background:var(--gray-light);border-left:3px solid var(--blue);padding:9px 12px;margin:16px 0 8px;border-radius:0 8px 8px 0}
+.section-title h3{font-size:12.5px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.3px}
+.section-title .hint{font-size:11px;color:var(--gray);margin-top:2px}
+
+/* Form rows */
+.form-row{display:flex;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border);gap:8px}
+.form-row .label{flex:1;font-size:13px;line-height:1.5;color:var(--text)}
+.form-row .btns{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.opt-btn{padding:5px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #d1d5db;background:#fff;color:var(--gray);transition:.15s}
+.opt-btn.sel-oui{border:none;background:var(--green-bg);color:#166534}
+.opt-btn.sel-non{border:none;background:var(--red-bg);color:#991b1b}
+.opt-btn.sel-na{border:none;background:#e5e7eb;color:#374151}
+.opt-btn.sel-blue{border:none;background:var(--blue);color:#fff}
+
+/* Inputs */
+.input-group{padding:8px 0;border-bottom:1px solid var(--border)}
+.input-group label{font-size:12px;color:var(--gray);font-weight:600;display:block;margin-bottom:4px}
+.input-group input,.input-group textarea{width:100%;padding:9px 11px;border:1px solid #d1d5db;border-radius:8px;font-size:13.5px;color:var(--text);background:#fff;resize:vertical}
+.input-group input:focus,.input-group textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,64,175,.1)}
+.row-2{display:flex;gap:8px}
+.row-2>*{flex:1}
+
+/* Checkboxes */
+.check-grid{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0;border-bottom:1px solid var(--border)}
+.check-grid .title{width:100%;font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.chk-btn{padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid #d1d5db;background:#fff;color:#94a3b8;transition:.15s}
+.chk-btn.on{border:none;background:var(--green-bg);color:#166534}
+
+/* Bottom bar */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;z-index:100}
+.btn-back{padding:10px 16px;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:var(--gray);font-size:13px;font-weight:600;cursor:pointer}
+.btn-next{flex:1;padding:11px 16px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-next.validated{background:var(--green-bg);color:#166534}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal{background:#fff;border-radius:14px;padding:24px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.modal h2{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.modal p{font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:16px}
+.modal .warnings{background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:10px;margin-bottom:16px}
+.modal .warnings .wtitle{font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px}
+.modal .warnings .witem{font-size:12px;color:#92400e;line-height:1.5}
+.modal .btns{display:flex;gap:8px}
+.modal .btn-cancel{flex:1;padding:10px;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:var(--gray);font-size:13px;font-weight:600;cursor:pointer}
+.modal .btn-confirm{flex:1;padding:10px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+
+/* Print form */
+.print-form{background:#fff;padding:20px;margin-top:8px;border-radius:10px;border:1px solid var(--border)}
+.print-form table{width:100%;border-collapse:collapse;margin-bottom:14px}
+.print-form td{padding:6px 8px;font-size:11.5px;line-height:1.4;color:var(--text);border:1px solid #cbd5e1;vertical-align:top}
+.print-form .sec-head{font-weight:700;text-align:center;background:#e2e8f0;font-size:12px}
+.print-form .sub-head{font-weight:700;background:#f8fafc}
+.print-form .sig-block{display:flex;gap:12px;margin-top:16px}
+.print-form .sig-box{flex:1;border:1px solid #cbd5e1;border-radius:6px;padding:10px}
+.print-form .sig-box .sig-label{font-size:11px;font-weight:700;margin-bottom:36px}
+.print-form .sig-box .sig-line{border-top:1px solid #cbd5e1;padding-top:4px;font-size:10px;color:#94a3b8}
+.btn-print{display:block;margin:16px auto;padding:12px 32px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(30,64,175,.3)}
+
+/* History */
+.history-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}
+.history-card h4{font-size:13px;font-weight:700;color:var(--text)}
+.history-card .meta{font-size:11px;color:var(--gray);margin-top:2px}
+.history-card .actions{display:flex;gap:6px;margin-top:10px}
+.history-card .actions button{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+
+/* Install banner */
+.install-banner{background:var(--blue);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.install-banner .ib-text{flex:1;font-size:13px;font-weight:600}
+.install-banner .ib-btn{padding:6px 14px;border-radius:6px;border:2px solid #fff;background:transparent;color:#fff;font-weight:700;font-size:12px;cursor:pointer}
+.install-banner .ib-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;padding:4px}
+
+@media print{
+  .header,.bottom-bar,.steps,.btn-print,.install-banner{display:none!important}
+  .content{padding:0!important}
+  .print-form{border:none;padding:0}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+// ============================================================
+// DATA & STATE
+// ============================================================
+const STEPS=[
+  {id:1,label:"Identification",icon:"①"},
+  {id:2,label:"Transport",icon:"②"},
+  {id:3,label:"Réception",icon:"③"},
+  {id:4,label:"Formulaire",icon:"④"}
+];
+const STORAGE_CONDS=[
+  {key:"cold",label:"2° – 8 °C"},{key:"controlled",label:"15° – 25 °C"},
+  {key:"ambient",label:"Temp. ambiante"},{key:"none",label:"Non mentionnée"}
+];
+const ETIQUETTE_CHECKS=[
+  ["checkDesignation","Désignation"],["checkNumLot","N° de lot"],["checkDDF","DDF"],
+  ["checkDDP","DDP"],["checkNumContenant","N° cont./Total"],["checkNomFabricant","Nom fabricant"],
+  ["checkQuantite","Qté/contenant"]
+];
+
+function emptyForm(){return{
+  dateDebut:"",heureDebut:"",quai:"",thermosensible:"",typeProduit:"",
+  videLigne:"",zoneReceptionPropre:"",numFacture:"",fournisseurAgree:"",
+  etiquetteFournisseur:"",quantiteConforme:"",obsIdentification:"",
+  vehiculeCouvert:"",tempAffichee:"",tempMaintenue:"",
+  paletteHT:"",palettesPropres:"",palettesFilmees:"",
+  contenantsConformes:"",absenceDommage:"",
+  conditionStockage:"",obsStockage:"",
+  aspectContenants:"",integriteFermeture:"",presenceEtiquetage:"",numDataLoggers:"",
+  checkDesignation:false,checkNumLot:false,checkDDF:false,checkDDP:false,
+  checkNumContenant:false,checkNomFabricant:false,checkQuantite:false,
+  correlationLots:"",correlationQuantites:"",dateFin:"",heureFin:"",
+  palettesFilmeesStockage:"",logbookComplete:"",obsReception:""
+}}
+
+let state={step:1,data:emptyForm(),validated:{},showConfirm:false,showMenu:false,history:loadHistory()};
+let deferredPrompt=null;
+let showInstallBanner=!localStorage.getItem("pwa-dismissed");
+
+function loadHistory(){try{return JSON.parse(localStorage.getItem("frm5-history")||"[]")}catch{return[]}}
+function saveHistory(){localStorage.setItem("frm5-history",JSON.stringify(state.history))}
+function saveDraft(){localStorage.setItem("frm5-draft",JSON.stringify({data:state.data,validated:state.validated,step:state.step}))}
+function loadDraft(){try{const d=JSON.parse(localStorage.getItem("frm5-draft"));if(d){state.data=d.data;state.validated=d.validated||{};state.step=d.step||1}}catch{}}
+
+// ============================================================
+// RENDER ENGINE
+// ============================================================
+function h(tag,attrs,...children){
+  const el=document.createElement(tag);
+  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
+    if(k==="style"&&typeof v==="object")Object.assign(el.style,v);
+    else if(k.startsWith("on"))el.addEventListener(k.slice(2).toLowerCase(),v);
+    else if(k==="className")el.className=v;
+    else if(k==="htmlFor")el.setAttribute("for",v);
+    else el.setAttribute(k,v);
+  });
+  children.flat(9).forEach(c=>{if(c!=null&&c!==false)el.append(typeof c==="string"||typeof c==="number"?document.createTextNode(c):c)});
+  return el;
+}
+
+function render(){
+  const app=document.getElementById("app");
+  app.innerHTML="";
+
+  // Install banner
+  if(showInstallBanner&&deferredPrompt){
+    app.append(h("div",{className:"install-banner"},
+      h("div",{className:"ib-text"},"Installer l'app sur votre appareil"),
+      h("button",{className:"ib-btn",onClick:installApp},"Installer"),
+      h("button",{className:"ib-close",onClick:()=>{showInstallBanner=false;localStorage.setItem("pwa-dismissed","1");render()}},"×")
+    ));
+  }
+
+  // Header
+  const header=h("div",{className:"header"},
+    h("div",{className:"header-top"},
+      h("div",{className:"header-badge"},"PF"),
+      h("div",null,
+        h("h1",null,"Réception Magasin PF"),
+        h("div",{className:"sub"},"GS-SOP-009-05/FRM5 · V04")
+      )
+    ),
+    h("div",{className:"steps"},
+      ...STEPS.map(s=>{
+        const done=state.validated[s.id];
+        const cur=state.step===s.id;
+        const cls="step-btn "+(cur?"current":done?"done":"locked");
+        return h("button",{className:cls,onClick:()=>{if(done||cur||state.validated[s.id-1]||s.id===1){state.step=s.id;render()}}},
+          (done?"✓ ":"")+s.label);
+      })
+    )
+  );
+  app.append(header);
+
+  // Content
+  const content=h("div",{className:"content"});
+  if(state.step===1)renderStep1(content);
+  else if(state.step===2)renderStep2(content);
+  else if(state.step===3)renderStep3(content);
+  else renderStep4(content);
+  app.append(content);
+
+  // Bottom bar
+  if(state.step<4){
+    const bar=h("div",{className:"bottom-bar"});
+    if(state.step>1)bar.append(h("button",{className:"btn-back",onClick:()=>{state.step--;render()}},"← Retour"));
+    const vd=state.validated[state.step];
+    bar.append(h("button",{className:"btn-next"+(vd?" validated":""),onClick:()=>{if(vd){state.step++;render()}else{state.showConfirm=true;render()}}},
+      vd?("✓ Validé — Suivant →"):("Valider « "+STEPS[state.step-1].label+" » →")));
+    app.append(bar);
+  }
+
+  // Modal
+  if(state.showConfirm){
+    const warns=getWarnings(state.step);
+    const overlay=h("div",{className:"modal-overlay"},
+      h("div",{className:"modal"},
+        h("h2",null,"Confirmer la validation"),
+        h("p",null,"Êtes-vous sûr de vouloir valider l'étape « ",h("strong",null,STEPS[state.step-1].label)," » ? Les données seront verrouillées."),
+        warns.length?h("div",{className:"warnings"},
+          h("div",{className:"wtitle"},"⚠ Champs non renseignés :"),
+          ...warns.map(w=>h("div",{className:"witem"},"• "+w))
+        ):null,
+        h("div",{className:"btns"},
+          h("button",{className:"btn-cancel",onClick:()=>{state.showConfirm=false;render()}},"Annuler"),
+          h("button",{className:"btn-confirm",onClick:()=>{state.validated[state.step]=true;state.showConfirm=false;state.step++;saveDraft();render()}},"Valider")
+        )
+      )
+    );
+    app.append(overlay);
+  }
+
+  saveDraft();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function secTitle(parent,title,hint){
+  const d=h("div",{className:"section-title"},h("h3",null,title));
+  if(hint)d.append(h("div",{className:"hint"},hint));
+  parent.append(d);
+}
+
+function radioRow(parent,label,name,opts){
+  opts=opts||[["Oui","oui"],["Non","non"]];
+  const row=h("div",{className:"form-row"},
+    h("div",{className:"label"},label),
+    h("div",{className:"btns"},
+      ...opts.map(([lbl,val])=>{
+        const sel=state.data[name]===val;
+        let cls="opt-btn";
+        if(sel)cls+=(val==="non"||val==="nonConforme"?" sel-non":val==="na"?" sel-na":" sel-oui");
+        return h("button",{className:cls,onClick:()=>{state.data[name]=state.data[name]===val?"":val;render()}},lbl);
+      })
+    )
+  );
+  parent.append(row);
+}
+
+function textInput(parent,label,name,type,placeholder){
+  const grp=h("div",{className:"input-group"},
+    h("label",null,label),
+    h("input",{type:type||"text",value:state.data[name]||"",placeholder:placeholder||"",onInput:e=>{state.data[name]=e.target.value;saveDraft()}})
+  );
+  parent.append(grp);
+}
+
+function textArea(parent,label,name,placeholder){
+  const grp=h("div",{className:"input-group"},
+    h("label",null,label),
+    h("textarea",{rows:"2",value:state.data[name]||"",placeholder:placeholder||"",onInput:e=>{state.data[name]=e.target.value;saveDraft()}},state.data[name]||"")
+  );
+  parent.append(grp);
+}
+
+function row2(parent,...fns){
+  const r=h("div",{className:"row-2"});
+  fns.forEach(fn=>{const d=h("div",null);fn(d);r.append(d)});
+  parent.append(r);
+}
+
+// ============================================================
+// STEP RENDERERS
+// ============================================================
+function renderStep1(c){
+  secTitle(c,"Identification de la réception");
+  row2(c,d=>textInput(d,"Date début","dateDebut","date"),d=>textInput(d,"Heure début","heureDebut","time"));
+  textInput(c,"Quai N°","quai","text","Ex: 03");
+  radioRow(c,"Produit thermosensible","thermosensible");
+  radioRow(c,"Type de produit","typeProduit",[["Produit fini","fini"],["Semi-fini","semi"]]);
+  radioRow(c,"Vide de ligne — zone réception / expédition","videLigne");
+  radioRow(c,"Zone de réception propre","zoneReceptionPropre");
+  textInput(c,"N° Facture / Bon de Livraison / Retour","numFacture","text","N° facture");
+  radioRow(c,"Le fournisseur figure sur la liste des fournisseurs agréés","fournisseurAgree",[["Oui","oui"],["Non","non"],["N/A","na"]]);
+  radioRow(c,"Étiquette d'identification fournisseur / fabricant","etiquetteFournisseur");
+  radioRow(c,"Quantité totale physique reçue conforme au BL / facture","quantiteConforme");
+  textArea(c,"Observations","obsIdentification","Observations...");
+}
+
+function renderStep2(c){
+  secTitle(c,"Conditions de transport","État du véhicule");
+  radioRow(c,"Véhicule couvert, propre et sec","vehiculeCouvert");
+  radioRow(c,"Température affichée vérifiée à l'arrivée du camion","tempAffichee",[["Oui","oui"],["Non","non"],["N/A","na"]]);
+  radioRow(c,"Le véhicule maintient la température requise (étiquette produit)","tempMaintenue");
+  secTitle(c,"État des palettes","Traitement thermique, propreté, filmage");
+  radioRow(c,"Présence du symbole (HT) — traitement thermique","paletteHT");
+  radioRow(c,"Palettes propres, intactes, non endommagées","palettesPropres");
+  radioRow(c,"Palettes filmées","palettesFilmees");
+  secTitle(c,"État des contenants","Dans le véhicule");
+  radioRow(c,"Contenants entreposés correctement","contenantsConformes",[["Conforme","conforme"],["Non conforme","nonConforme"]]);
+  radioRow(c,"Absence de dommage apparent (déchiré, déversement…)","absenceDommage",[["Conforme","conforme"],["Non conforme","nonConforme"]]);
+}
+
+function renderStep3(c){
+  secTitle(c,"Conditions de stockage","Identification selon documents / étiquette");
+  const cg=h("div",{style:"padding:10px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px"});
+  STORAGE_CONDS.forEach(sc=>{
+    const sel=state.data.conditionStockage===sc.key;
+    cg.append(h("button",{className:"opt-btn"+(sel?" sel-blue":""),onClick:()=>{state.data.conditionStockage=sel?"":sc.key;render()}},sc.label));
+  });
+  c.append(cg);
+  textArea(c,"Observations stockage","obsStockage","Observations...");
+
+  secTitle(c,"Réception physique","Au niveau de la zone de réception");
+  radioRow(c,"Aspect des contenants (déchiré, ouvert, sale…)","aspectContenants",[["Conforme","conforme"],["Non conforme","nonConforme"]]);
+  radioRow(c,"Intégrité de la fermeture","integriteFermeture");
+  radioRow(c,"Présence de l'étiquetage d'identification fournisseur / fabricant","presenceEtiquetage");
+  textInput(c,"N° de série du/des data loggers","numDataLoggers","text","9204261, 2150326...");
+
+  const cg2=h("div",{className:"check-grid"},h("div",{className:"title"},"Contenu de l'étiquette d'identification :"));
+  ETIQUETTE_CHECKS.forEach(([k,l])=>{
+    cg2.append(h("button",{className:"chk-btn"+(state.data[k]?" on":""),onClick:()=>{state.data[k]=!state.data[k];render()}},(state.data[k]?"☑ ":"☐ ")+l));
+  });
+  c.append(cg2);
+
+  radioRow(c,"Corrélation lots réceptionnés / facture","correlationLots");
+  radioRow(c,"Corrélation quantités réceptionnées / facture","correlationQuantites");
+  row2(c,d=>textInput(d,"Date fin","dateFin","date"),d=>textInput(d,"Heure fin","heureFin","time"));
+  radioRow(c,"Palettes filmées (côtés/dessus), sans extrémité film, avant stockage","palettesFilmeesStockage",[["Oui","oui"],["Non","non"],["N/A","na"]]);
+  radioRow(c,"Le logbook de réception a été dûment complété","logbookComplete");
+  textArea(c,"Observations","obsReception","Observations...");
+}
+
+function renderStep4(c){
+  c.append(h("div",{style:"text-align:center;padding:16px 0 8px"},
+    h("div",{style:"font-size:15px;font-weight:700"},"Formulaire complété"),
+    h("div",{style:"font-size:12px;color:var(--gray);margin-top:4px"},"Vérifiez puis imprimez ou sauvegardez")
+  ));
+
+  const pf=h("div",{className:"print-form",id:"print-zone"});
+  buildPrintForm(pf);
+  c.append(pf);
+
+  const btns=h("div",{style:"display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;justify-content:center"});
+  btns.append(h("button",{className:"btn-print",onClick:()=>window.print()},"🖨️ Imprimer"));
+  btns.append(h("button",{className:"btn-print",style:"background:#16a34a",onClick:saveToHistory},"💾 Sauvegarder"));
+  btns.append(h("button",{className:"btn-print",style:"background:#64748b",onClick:newForm},"＋ Nouveau"));
+  c.append(btns);
+
+  // History
+  if(state.history.length){
+    c.append(h("div",{style:"margin-top:20px"},
+      h("div",{style:"font-size:13px;font-weight:700;color:var(--gray);margin-bottom:8px"},"HISTORIQUE ("+state.history.length+")")
+    ));
+    state.history.slice().reverse().forEach((entry,i)=>{
+      const idx=state.history.length-1-i;
+      const card=h("div",{className:"history-card"},
+        h("h4",null,"Réception du "+(entry.data.dateDebut||"—")),
+        h("div",{className:"meta"},"Quai: "+(entry.data.quai||"—")+" · Facture: "+(entry.data.numFacture||"—")+" · "+(entry.ts||"")),
+        h("div",{className:"actions"},
+          h("button",{style:"border:1px solid var(--blue);background:#fff;color:var(--blue)",onClick:()=>{state.data={...entry.data};state.validated={1:true,2:true,3:true};state.step=4;render()}},"Voir"),
+          h("button",{style:"border:1px solid var(--red);background:#fff;color:var(--red)",onClick:()=>{state.history.splice(idx,1);saveHistory();render()}},"Suppr.")
+        )
+      );
+      c.append(card);
+    });
+  }
+}
+
+function buildPrintForm(pf){
+  const d=state.data;
+  const yn=v=>v==="oui"?"☑ Oui ☐ Non":v==="non"?"☐ Oui ☑ Non":v==="na"?"N/A":"—";
+  const cf=v=>v==="conforme"?"☑ Conforme ☐ Non conf.":v==="nonConforme"?"☐ Conforme ☑ Non conf.":"—";
+  const chk=v=>v?"☑":"☐";
+  const cs=STORAGE_CONDS.find(x=>x.key===d.conditionStockage);
+
+  // Header table
+  const ht=document.createElement("table");
+  ht.innerHTML=`<tr><td rowspan=3 style="width:15%;text-align:center;font-weight:800;font-size:16px;color:var(--blue)">LDM</td>
+    <td rowspan=3 style="width:45%;text-align:center;font-weight:700;font-size:13px">Checklist des réceptions au magasin PF</td>
+    <td style="font-size:11px"><b>Réf:</b> GS-SOP-009-05/FRM5</td></tr>
+    <tr><td style="font-size:11px"><b>Version:</b> 04</td></tr>
+    <tr><td style="font-size:11px"><b>Date:</b> ${d.dateDebut||"___/___/___"}</td></tr>`;
+  pf.append(ht);
+
+  function section(title,rows,subSections){
+    const t=document.createElement("table");
+    t.innerHTML=`<tr><td colspan=2 class="sec-head">${title}</td></tr>`;
+    if(subSections){
+      subSections.forEach(ss=>{
+        if(ss.sub)t.innerHTML+=`<tr><td colspan=2 class="sub-head">${ss.sub}</td></tr>`;
+        ss.rows.forEach(r=>t.innerHTML+=`<tr><td style="width:60%">${r[0]}</td><td style="text-align:center">${r[1]}</td></tr>`);
+      });
+    }else{
+      rows.forEach(r=>t.innerHTML+=`<tr><td style="width:60%">${r[0]}</td><td style="text-align:center">${r[1]}</td></tr>`);
+    }
+    pf.append(t);
+  }
+
+  section("IDENTIFICATION DE LA RÉCEPTION",[
+    ["Date et heure de début",`${d.dateDebut||"—"}  ${d.heureDebut||"—"}`],
+    ["Quai N°",d.quai||"—"],
+    ["Produit thermosensible",yn(d.thermosensible)],
+    ["Type de produit",d.typeProduit==="fini"?"☑ Produit fini ☐ Semi-fini":d.typeProduit==="semi"?"☐ Produit fini ☑ Semi-fini":"—"],
+    ["Vide de ligne zone réception/expédition",yn(d.videLigne)],
+    ["Zone de réception propre",yn(d.zoneReceptionPropre)],
+    ["N° Facture / BL / Retour",d.numFacture||"—"],
+    ["Fournisseur agréé",yn(d.fournisseurAgree)],
+    ["Étiquette identification fournisseur",yn(d.etiquetteFournisseur)],
+    ["Quantité conforme au BL/facture",yn(d.quantiteConforme)],
+    ["Observations",d.obsIdentification||"—"]
+  ]);
+
+  section("VÉRIFICATION DES CONDITIONS DE TRANSPORT",null,[
+    {sub:"État du Véhicule",rows:[
+      ["Véhicule couvert, propre et sec",yn(d.vehiculeCouvert)],
+      ["Température affichée vérifiée à l'arrivée",yn(d.tempAffichee)],
+      ["Véhicule maintient température requise",yn(d.tempMaintenue)]
+    ]},
+    {sub:"État des Palettes",rows:[
+      ["Symbole (HT) traitement thermique",yn(d.paletteHT)],
+      ["Palettes propres, intactes",yn(d.palettesPropres)],
+      ["Palettes filmées",yn(d.palettesFilmees)]
+    ]},
+    {sub:"État des Contenants",rows:[
+      ["Contenants entreposés correctement",cf(d.contenantsConformes)],
+      ["Absence de dommage apparent",cf(d.absenceDommage)]
+    ]}
+  ]);
+
+  section("RÉCEPTION PHYSIQUE",[
+    ["Conditions de stockage",cs?cs.label:"—"],
+    ["Aspect des contenants",cf(d.aspectContenants)],
+    ["Intégrité de la fermeture",yn(d.integriteFermeture)],
+    ["Étiquetage fournisseur/fabricant",yn(d.presenceEtiquetage)],
+    ["N° data loggers",d.numDataLoggers||"—"],
+    ["Contenu étiquette",`${chk(d.checkDesignation)} Désign. ${chk(d.checkNumLot)} Lot ${chk(d.checkDDF)} DDF ${chk(d.checkDDP)} DDP<br>${chk(d.checkNumContenant)} N° cont. ${chk(d.checkNomFabricant)} Fabricant ${chk(d.checkQuantite)} Qté`],
+    ["Corrélation lots/facture",yn(d.correlationLots)],
+    ["Corrélation quantités/facture",yn(d.correlationQuantites)],
+    ["Date et heure de fin",`${d.dateFin||"—"}  ${d.heureFin||"—"}`],
+    ["Palettes filmées avant stockage",yn(d.palettesFilmeesStockage)],
+    ["Logbook complété",yn(d.logbookComplete)],
+    ["Observations",d.obsReception||"—"]
+  ]);
+
+  // Signatures
+  const sb=h("div",{className:"sig-block"});
+  ["Réceptionné par","Vérifié par","Approuvé par"].forEach(l=>{
+    sb.append(h("div",{className:"sig-box"},h("div",{className:"sig-label"},l),h("div",{className:"sig-line"},"Nom / Date / Visa")));
+  });
+  pf.append(sb);
+}
+
+// ============================================================
+// WARNINGS
+// ============================================================
+function getWarnings(s){
+  const w=[],d=state.data;
+  if(s===1){
+    if(!d.dateDebut)w.push("Date de début");if(!d.heureDebut)w.push("Heure de début");
+    if(!d.thermosensible)w.push("Produit thermosensible");if(!d.typeProduit)w.push("Type de produit");
+    if(!d.videLigne)w.push("Vide de ligne");if(!d.zoneReceptionPropre)w.push("Zone réception propre");
+    if(!d.fournisseurAgree)w.push("Fournisseur agréé");if(!d.quantiteConforme)w.push("Quantité conforme");
+  }else if(s===2){
+    if(!d.vehiculeCouvert)w.push("Véhicule couvert/propre");if(!d.paletteHT)w.push("Traitement thermique");
+    if(!d.palettesPropres)w.push("Palettes propres");if(!d.palettesFilmees)w.push("Palettes filmées");
+    if(!d.contenantsConformes)w.push("Contenants conformes");if(!d.absenceDommage)w.push("Absence dommage");
+  }else if(s===3){
+    if(!d.conditionStockage)w.push("Conditions stockage");if(!d.aspectContenants)w.push("Aspect contenants");
+    if(!d.integriteFermeture)w.push("Intégrité fermeture");if(!d.correlationLots)w.push("Corrélation lots");
+    if(!d.correlationQuantites)w.push("Corrélation quantités");if(!d.logbookComplete)w.push("Logbook");
+    if(!d.dateFin)w.push("Date de fin");
+  }
+  return w;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function saveToHistory(){
+  state.history.push({data:{...state.data},ts:new Date().toLocaleString("fr-FR")});
+  saveHistory();
+  alert("✅ Formulaire sauvegardé dans l'historique !");
+  render();
+}
+function newForm(){
+  if(!confirm("Créer un nouveau formulaire vierge ?"))return;
+  state.data=emptyForm();state.validated={};state.step=1;
+  localStorage.removeItem("frm5-draft");
+  render();
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;render()});
+function installApp(){
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(r=>{deferredPrompt=null;showInstallBanner=false;render()});
+}
+
+// ============================================================
+// MANIFEST (inline)
+// ============================================================
+const manifest={
+  name:"Réception PF — FRM5",
+  short_name:"FRM5",
+  description:"Checklist réception produits finis GS-SOP-009-05/FRM5",
+  start_url:".",
+  display:"standalone",
+  orientation:"portrait",
+  theme_color:"#1e40af",
+  background_color:"#f8fafc",
+  icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%231e40af"/><text x="50" y="62" text-anchor="middle" font-family="Arial" font-weight="800" font-size="32" fill="white">PF</text></svg>'),sizes:"any",type:"image/svg+xml"}]
+};
+const blob=new Blob([JSON.stringify(manifest)],{type:"application/json"});
+document.getElementById("manifest-link").href=URL.createObjectURL(blob);
+
+// Service Worker (inline registration)
+if("serviceWorker"in navigator){
+  const swCode=`self.addEventListener("install",e=>self.skipWaiting());
+self.addEventListener("activate",e=>e.waitUntil(clients.claim()));
+self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{
+  if(resp.status===200){const c=resp.clone();caches.open("frm5-v1").then(cache=>cache.put(e.request,c))}return resp;
+}).catch(()=>new Response("Offline",{status:503}))))});`;
+  const swBlob=new Blob([swCode],{type:"application/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadDraft();
+render();
+</script>
+</body>
+</html>
