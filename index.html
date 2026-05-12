@@ -117,7 +117,7 @@ function sh(){localStorage.setItem("frm5-h3",JSON.stringify(S.hist))}
 function sd(){localStorage.setItem("frm5-d3",JSON.stringify({data:S.data,val:S.val,step:S.step,fid:S.fid,log:S.log}))}
 function ld(){try{const d=JSON.parse(localStorage.getItem("frm5-d3"));if(d){S.data=d.data;S.val=d.val||{};S.step=d.step||1;S.fid=d.fid||gid();S.log=d.log||[]}}catch{}}
 function la(action,etape,detail){const e={ts:nw(),time:nt(),action,etape:etape||"",detail:detail||""};S.log.push(e);sd();ss({type:"audit",timestamp:e.ts,ficheId:S.fid,operateur:S.op,action,etape:e.etape,detail:e.detail})}
-async function ss(p){if(!SCRIPT_URL)return;S.sync="syncing";R();try{await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});S.sync="ok"}catch{S.sync="error"}R();setTimeout(()=>{S.sync="";R()},2000)}
+async function ss(p){if(!SCRIPT_URL)return;S.sync="syncing";R();try{await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(p)});S.sync="ok"}catch{S.sync="error"}R();setTimeout(()=>{S.sync="";R()},2000)}
 async function sf(){await ss({type:"fiche",fiche:{...S.data,id:S.fid,operateur:S.op,dateCreation:nd(),heureCreation:nt()}})}
 
 function h(t,a,...c){const e=document.createElement(t);if(a)Object.entries(a).forEach(([k,v])=>{if(k==="style"&&typeof v==="object")Object.assign(e.style,v);else if(k.startsWith("on"))e.addEventListener(k.slice(2).toLowerCase(),v);else if(k==="className")e.className=v;else e.setAttribute(k,v)});c.flat(9).forEach(x=>{if(x!=null&&x!==false)e.append(typeof x==="string"||typeof x==="number"?document.createTextNode(String(x)):x)});return e}
